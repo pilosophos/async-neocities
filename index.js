@@ -9,6 +9,7 @@ import assert from 'webassert'
 import { URL } from 'url'
 import qs from 'querystring'
 import os from 'os'
+import * as path from 'path'
 
 // Use import for local files as well
 import { neocitiesLocalDiff } from './lib/folder-diff.js'
@@ -30,6 +31,8 @@ const ERROR = 'error'
 const INSPECTING = 'inspecting'
 const DIFFING = 'diffing'
 const APPLYING = 'applying'
+// Allowed Neocities extensions (see https://neocities.org/site_files/allowed_types)
+const ALLOWED_EXTENSIONS = 'apng asc atom avif bin css csv dae eot epub geojson gif gltf gpg htm html ico jpeg jpg js json key kml knowl less manifest map markdown md mf mid midi mtl obj opml osdx otf pdf pgp pls png rdf resolveHandle rss sass scss svg text toml tsv ttf txt webapp webmanifest webp woff woff2 xcf xml yaml yml'.split(' ')
 
 /**
  * NeocitiesAPIClient class representing a neocities api client.
@@ -324,11 +327,20 @@ export class NeocitiesAPIClient {
       afw.allFiles(directory, { shaper: f => f }),
       this.list().then(res => res.files)
     ])
+
+    const allowedLocalFiles = [];
+    for (let file of localFiles) {
+      const extension = path.extname(file).toLowerCase()
+      if (extension === '' || ALLOWED_EXTENSIONS.includes(extension)) {
+        allowedLocalFiles.push(file)
+      }
+    }
+
     statsCb({ stage: INSPECTING, status: STOP })
 
     // DIFFING STAGE
     statsCb({ stage: DIFFING, status: START })
-    const { filesToUpload, filesToDelete, filesSkipped, protectedFiles } = await neocitiesLocalDiff(remoteFiles, localFiles, { protectedFileFilter })
+    const { filesToUpload, filesToDelete, filesSkipped, protectedFiles } = await neocitiesLocalDiff(remoteFiles, allowedLocalFiles, { protectedFileFilter })
     statsCb({ stage: DIFFING, status: STOP })
 
     // APPLYING STAGE
