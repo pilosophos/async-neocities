@@ -344,10 +344,9 @@ export class NeocitiesAPIClient {
     statsCb({ stage: APPLYING, status: START })
     const work = []
 
-    console.log(filesToUpload);
     const allowedFilesToUpload = [];
     for (let file of filesToUpload) {
-      const extension = path.extname(file).toLowerCase()
+      const extension = path.extname(file.name).toLowerCase()
       if (extension === '' || ALLOWED_EXTENSIONS.includes(extension)) {
         allowedFilesToUpload.push(file)
       }
