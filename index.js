@@ -328,14 +328,6 @@ export class NeocitiesAPIClient {
       this.list().then(res => res.files)
     ])
 
-    const allowedLocalFiles = [];
-    for (let file of localFiles) {
-      const extension = path.extname(file).toLowerCase()
-      if (extension === '' || ALLOWED_EXTENSIONS.includes(extension)) {
-        allowedLocalFiles.push(file)
-      }
-    }
-
     statsCb({ stage: INSPECTING, status: STOP })
 
     // DIFFING STAGE
@@ -352,8 +344,17 @@ export class NeocitiesAPIClient {
     statsCb({ stage: APPLYING, status: START })
     const work = []
 
-    if (filesToUpload.length > 0) {
-      const uploadJob = this.upload(filesToUpload, {
+    console.log(filesToUpload);
+    const allowedFilesToUpload = [];
+    for (let file of filesToUpload) {
+      const extension = path.extname(file).toLowerCase()
+      if (extension === '' || ALLOWED_EXTENSIONS.includes(extension)) {
+        allowedFilesToUpload.push(file)
+      }
+    }
+
+    if (allowedFilesToUpload.length > 0) {
+      const uploadJob = this.upload(allowedFilesToUpload, {
         batchSize: opts.batchSize,
         statsCb ({ totalBytes, bytesWritten }) {
           statsCb({
