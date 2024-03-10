@@ -332,7 +332,7 @@ export class NeocitiesAPIClient {
 
     // DIFFING STAGE
     statsCb({ stage: DIFFING, status: START })
-    const { filesToUpload, filesToDelete, filesSkipped, protectedFiles } = await neocitiesLocalDiff(remoteFiles, allowedLocalFiles, { protectedFileFilter })
+    const { filesToUpload, filesToDelete, filesSkipped, protectedFiles } = await neocitiesLocalDiff(remoteFiles, localFiles, { protectedFileFilter })
     statsCb({ stage: DIFFING, status: STOP })
 
     // APPLYING STAGE
